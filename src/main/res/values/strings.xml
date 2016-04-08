@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Todo</string>
+    <string name="todo_input_hint">Enter todo</string>
+    <string name="clear_icon">\ue14c</string>
+    <string name="delete_icon">\ue872</string>
 </resources>

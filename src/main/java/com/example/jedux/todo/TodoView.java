@@ -2,10 +2,8 @@ package com.example.jedux.todo;
 
 import android.content.Context;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 
 import com.example.jedux.todo.State.Task;
 
@@ -26,44 +24,41 @@ public class TodoView extends RenderableView {
     }
 
     public void view() {
-        linearLayout(() -> {
-            size(FILL, FILL);
-            orientation(LinearLayout.VERTICAL);
+        mTaskAdapter.notifyDataSetChanged();
 
-            linearLayout(() -> {
-                size(FILL, WRAP);
+        frameLayout(() -> {
+            Style.windowBackground(() -> {
+                // task name input
+                Style.Input.layout(() -> {
+                    Style.Input.text(() -> {
+                        text(mInput);
+                        onTextChanged(s -> mInput = s.toString());
+                        onEditorAction((v, actionId, keyEvent) -> {
+                            if (actionId == EditorInfo.IME_ACTION_DONE && mInput.trim().length() > 0) {
+                                App.dispatch(new Action<>(ActionType.ADD, mInput));
+                                mInput = "";
+                            }
+                            return false;
+                        });
+                    });
 
-                editText(() -> {
-                    size(0, WRAP);
+                    // clear input button
+                    Style.deleteButton(() -> onClick(v -> mInput = ""));
+                });
+
+                // task list
+                listView(() -> {
+                    size(FILL, WRAP);
                     weight(1);
-                    text(mInput);
-                    imeOptions(EditorInfo.IME_ACTION_DONE);
-                    singleLine(true);
-                    onEditorAction((v, actionId, keyEvent) -> {
-                        if (actionId == EditorInfo.IME_ACTION_DONE && mInput.trim().length() > 0) {
-                            App.dispatch(new Action<>(ActionType.ADD, mInput));
-                            mInput = "";
-                        }
-                        return false;
-                    });
-                    onTextChanged(s -> {
-                        mInput = s.toString();
-                    });
+                    divider(null);
+                    adapter(mTaskAdapter);
                 });
             });
 
-            button(() -> {
-                size(WRAP, WRAP);
-                text("CLEAR CHECKED");
+            // clear checked tasks button
+            Style.bottomBar(() -> {
                 visibility(App.state().hasChecked());
                 onClick(v -> App.dispatch(new Action<>(ActionType.DELETE_CHECKED)));
-            });
-
-            listView(() -> {
-                size(FILL, WRAP);
-                weight(1);
-                adapter(mTaskAdapter);
-                mTaskAdapter.notifyDataSetChanged();
             });
         });
     }
@@ -81,26 +76,17 @@ public class TodoView extends RenderableView {
 
         @Override
         public void view(int pos) {
-            linearLayout(() -> {
-                size(FILL, WRAP);
-                gravity(Gravity.CENTER_VERTICAL);
+            Style.Card.layout(() -> {
 
-                checkBox(() -> {
-                    size(0, WRAP);
-                    weight(1);
-                    padding(dip(10), 0, 0, 0);
+                Style.Card.checkbox(() -> {
                     text("#"+getItem(pos).id()+": "+getItem(pos).name());
                     onCheckedChange((CompoundButton btn, boolean isChecked) -> {
-                        App.dispatch(new Action<>(ActionType.TOGGLE, new Pair(getItem(pos).id(), isChecked)));
+                        App.dispatch(new Action<>(ActionType.TOGGLE, new Pair<>(getItem(pos).id(), isChecked)));
                     });
                     checked(getItem(pos).checked());
                 });
 
-                button(() -> {
-                    size(WRAP, WRAP);
-                    text("DELETE");
-                    onClick(v -> App.dispatch(new Action<>(ActionType.DELETE, getItem(pos).id())));
-                });
+                Style.Card.delete(() -> onClick(v -> App.dispatch(new Action<>(ActionType.DELETE, getItem(pos).id()))));
             });
         }
     }
