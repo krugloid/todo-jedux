@@ -25,6 +25,15 @@ public abstract class State {
 
     abstract List<Task> tasks();
 
+    boolean hasChecked() {
+        for (Task t : tasks()) {
+            if (t.checked()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     static State getDefault() {
         return ImmutableState.builder().build();
     }
