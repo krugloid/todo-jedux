@@ -17,9 +17,13 @@ public class App extends Application {
         super.onCreate();
         sInstance = this;
 
-        State initialState = State.getDefault();
+        PersistanceController persistanceController = new PersistanceController(this);
+        State initialState = persistanceController.getSavedState();
+        if (initialState == null) {
+            initialState = State.getDefault();
+        }
 
-        this.store = new Store<>(new State.Reducer(), initialState);
+        this.store = new Store<>(new State.Reducer(), initialState, persistanceController);
 
         this.store.subscribe(Anvil::render);
     }
