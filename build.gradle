@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    compile 'co.trikita:anvil-sdk19:0.3.1'
+    compile 'co.trikita:anvil-sdk19:0.3.6'
     compile 'com.github.trikita:jedux:-SNAPSHOT'
 
     compile 'org.immutables:gson:2.1.14'
